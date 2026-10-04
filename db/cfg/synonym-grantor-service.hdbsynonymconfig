@@ -1,0 +1,8 @@
+{
+  "CUSTOMERS_GV": {
+    "target": {
+      "object": "CUSTOMERS_GV",
+      "schema": "NAR_QA"
+    }
+  }
+}

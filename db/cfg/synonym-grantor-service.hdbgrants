@@ -1,0 +1,33 @@
+{
+	"synonym-grantor-service": {
+		"application_user": {
+			"object_privileges": [
+				{
+					"schema": "NAR_QA",
+					"name": "CUSTOMERS_GV",
+					"privileges": [
+						"SELECT"
+					],
+					"privileges_with_grant_option": [
+						"SELECT"
+					]
+				}
+			]
+		},
+		"object_owner": {
+			"object_privileges": [
+				{
+					"type": "VIEW",
+					"name": "CUSTOMERS_GV",
+					"privileges_with_grant_option": [
+						"SELECT"
+					],
+					"schema": "NAR_QA",
+					"privileges": [
+						"SELECT"
+					]
+				}
+			]
+		}
+	}
+}

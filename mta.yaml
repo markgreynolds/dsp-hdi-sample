@@ -1,0 +1,27 @@
+_schema-version: "2.1"
+ID: I852681HDI
+version: 0.0.1
+modules:
+- name: db
+  type: hdb
+  path: db
+  requires:
+  - name: hdi_db
+    properties:
+      TARGET_CONTAINER: ~{hdi-container-name}
+  - name: synonym-grantor-service
+    group: SERVICE_REPLACEMENTS
+    properties:
+      key: synonym-grantor-service
+      service: ~{ups-service-name}
+resources:
+- name: hdi_db
+  type: com.sap.xs.hdi-container
+  properties:
+    hdi-container-name: ${service-name}
+- name: synonym-grantor-service
+  type: org.cloudfoundry.existing-service
+  parameters:
+    service-name: synonym-grantor-service
+  properties:
+    ups-service-name: ${service-name}

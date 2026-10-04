@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="CV_CUSTOMERS" applyPrivilegeType="NONE" dataCategory="CUBE" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Aggregation" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" application="BAS" generateCSNModel="CONSTRUCTION_KIT">
+<descriptions defaultDescription="CV_CUSTOMERS"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="CUSTOMERS_GV">
+    <resourceUri>CUSTOMERS_GV</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews/>
+
+<logicalModel id="CUSTOMERS_GV">
+  <attributes>
+    <attribute id="company_id" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="company_id"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="company_id"/>
+    </attribute>
+    <attribute id="company_name" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="company_name"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="company_name"/>
+    </attribute>
+    <attribute id="industry" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="industry"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="industry"/>
+    </attribute>
+    <attribute id="contact_first_name" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="contact_first_name"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="contact_first_name"/>
+    </attribute>
+    <attribute id="contact_last_name" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="contact_last_name"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="contact_last_name"/>
+    </attribute>
+    <attribute id="job_title" order="6" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="job_title"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="job_title"/>
+    </attribute>
+    <attribute id="email" order="7" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="email"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="email"/>
+    </attribute>
+    <attribute id="phone" order="8" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="phone"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="phone"/>
+    </attribute>
+    <attribute id="city" order="9" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="city"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="city"/>
+    </attribute>
+    <attribute id="state" order="10" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="state"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="state"/>
+    </attribute>
+    <attribute id="employees" order="11" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="employees"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="employees"/>
+    </attribute>
+    <attribute id="annual_revenue_usd" order="12" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="annual_revenue_usd"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="annual_revenue_usd"/>
+    </attribute>
+    <attribute id="founded_year" order="13" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="founded_year"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="founded_year"/>
+    </attribute>
+    <attribute id="account_status" order="14" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="account_status"/>
+      <keyMapping columnObjectName="CUSTOMERS_GV" columnName="account_status"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures>
+    <measure id="COUNTER" order="15" aggregationType="sum" measureType="simple" calculatedMeasureType="counter" datatype="BIGINT">
+      <descriptions defaultDescription="COUNTER"/>
+      <exceptionAggregation>
+        <attribute attributeName="company_id"/>
+      </exceptionAggregation>
+      <formula>1</formula>
+      <exceptionAggregationMetadata/>
+    </measure>
+  </calculatedMeasures>
+  <restrictedMeasures/>
+  <localDimensions/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+    
+  </shapes>
+</layout>
+</Calculation:scenario>

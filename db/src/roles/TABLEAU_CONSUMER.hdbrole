@@ -1,0 +1,14 @@
+{
+  "role": {
+    "name" : "TABLEAU_CONSUMER",
+    "object_privileges": [
+      {
+        "name": "CV_CUSTOMERS",
+        "type": "VIEW",
+        "privileges": [
+          "SELECT"
+        ]
+      }
+    ]
+  }
+}

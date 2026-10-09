@@ -6,10 +6,11 @@ When an SAP HANA HDI container needs to read data from a table or view that live
 **outside** the container — in a separate schema managed by a different team or system —
 you cannot simply write a SQL query against it. HDI containers are isolated by design:
 they own their own schema, deploy their own objects, and control their own privileges.
-To reach across that boundary, you need three things working together: a **synonym** that
-acts as a local alias for the external object, a **grantor service** that holds the
-credentials of a database user with access to that external object, and a **grants file**
-that instructs HDI to request the necessary privileges through that grantor.
+To reach across that boundary, you need three things working together: 
+
+- a **synonym** that acts as a local alias for the external object, 
+- a **grantor service** that holds the credentials of a database user with access to that external object, and 
+- a **grants file** that instructs HDI to request the necessary privileges through that grantor.
 
 This document explains how those pieces connect, why the naming relationships between
 them are so strict, and what goes wrong — silently — when they are not aligned.
@@ -36,7 +37,7 @@ in your `.hdbgrants` file.
 ### How to create one
 
 ```bash
-cf create-user-provided-service external-sales-grantor \
+cf create-user-provided-service synonym-grantor-service \
   -p '{
   "host":"your-hana-host.hanacloud.ondemand.com",
   "port":"443",
@@ -47,7 +48,7 @@ cf create-user-provided-service external-sales-grantor \
 }'
 ```
 
-The name you give the UPS here — `external-sales-grantor` in this example — is the
+The name you give the UPS here — `synonym-grantor-service` in this example — is the
 anchor of the entire naming chain. Every configuration file in your HDI project that
 participates in this synonym setup must reference this exact name.
 
@@ -70,7 +71,7 @@ errors, and in some cases a synonym that appears to work while being incompletel
 configured.
 
 ```
-UPS name in CF/BTP  (e.g. "external-sales-grantor")
+UPS name in CF/BTP  (e.g. "synonym-grantor-service")
     │
     ├── mta.yaml  →  resource name: must equal the UPS name
     │                requires: entry under the HDI module must reference that resource
@@ -91,7 +92,7 @@ object and schema. But it must be consistent with the object and schema names us
 | CF CLI / BTP | `cf create-user-provided-service <name>` | Your chosen grantor service name |
 | `mta.yaml` | resource `name:` | The UPS name from CF |
 | `mta.yaml` | `requires:` entry under the HDI deployer module | The resource name above |
-| `.hdbgrants` | Top-level key (e.g. `"external-sales-grantor"`) | The UPS name |
+| `.hdbgrants` | Top-level key (e.g. `"synonym-grantor-service"`) | The UPS name |
 | `.hdbsynonymconfig` | `"target"."service"` value | The UPS name |
 | `.hdbsynonym` | `"target"."object"` and `"target"."schema"` | The actual DB object name and schema |
 
@@ -108,7 +109,7 @@ for a reporting application needs read access to a view `V_SALES_SUMMARY` in an 
 schema `SALES_DATA`.
 
 **Chosen names:**
-- UPS / grantor service name: `external-sales-grantor`
+- UPS / grantor service name: `synonym-grantor-service`
 - External schema: `SALES_DATA`
 - External object: `V_SALES_SUMMARY` (a view)
 - Local synonym name: `SALES_SUMMARY` (what the HDI container will call it internally)
@@ -116,11 +117,11 @@ schema `SALES_DATA`.
 ### Step 1 — Create the UPS in CF/BTP
 
 ```bash
-cf create-user-provided-service external-sales-grantor \
+cf create-user-provided-service synonym-grantor-service \
   -p '{"host":"your-hana-host.hanacloud.ondemand.com","port":"443","user":"SALES_GRANTOR_USER","password":"<password>","schema":"SALES_DATA","tags":["hana"]}'
 ```
 
-The name `external-sales-grantor` is now registered in CF. This is the name that
+The name `synonym-grantor-service` is now registered in CF. This is the name that
 appears in `VCAP_SERVICES` when the service is bound.
 
 ---
@@ -137,19 +138,19 @@ modules:
     path: db
     requires:
       - name: my-reporting-app-hdi-container
-      - name: external-sales-grantor          # ← binds the UPS to this module
+      - name: synonym-grantor-service          # ← binds the UPS to this module
 
 resources:
   - name: my-reporting-app-hdi-container
     type: com.sap.services.hana.hdi-shared
 
-  - name: external-sales-grantor              # ← must match the CF UPS name exactly
+  - name: synonym-grantor-service              # ← must match the CF UPS name exactly
     type: org.cloudfoundry.user-provided-service
 ```
 
-When `cf deploy` processes this MTA, CF binds the `external-sales-grantor` UPS to the
+When `cf deploy` processes this MTA, CF binds the `synonym-grantor-service` UPS to the
 deployer module. The HDI deployer can then find it in `VCAP_SERVICES` under the key
-`external-sales-grantor`.
+`synonym-grantor-service`.
 
 ---
 
@@ -187,7 +188,7 @@ UPS name.
     "target": {
       "object": "V_SALES_SUMMARY",
       "schema": "SALES_DATA",
-      "service": "external-sales-grantor"
+      "service": "synonym-grantor-service"
     }
   }
 }
@@ -206,7 +207,7 @@ must be granted: the object owner (`#OO`) and the application/runtime user (`#RT
 
 ```json
 {
-  "external-sales-grantor": {
+  "synonym-grantor-service": {
     "object_owner": {
       "object_privileges": [
         {
@@ -232,7 +233,7 @@ must be granted: the object owner (`#OO`) and the application/runtime user (`#RT
 }
 ```
 
-The top-level key `"external-sales-grantor"` is how the HDI deployer looks up the
+The top-level key `"synonym-grantor-service"` is how the HDI deployer looks up the
 correct credentials in `VCAP_SERVICES`. It must be identical to the UPS name.
 
 > Replace `"type": "VIEW"` with `"type": "TABLE"` if the external object is a table.
@@ -243,13 +244,13 @@ correct credentials in `VCAP_SERVICES`. It must be identical to the UPS name.
 
 When `cf deploy` (or `hdi-deploy`) runs, the sequence is:
 
-1. CF binds `external-sales-grantor` to the deployer module → credentials appear in
-   `VCAP_SERVICES["external-sales-grantor"]`
-2. The deployer reads `.hdbgrants`, finds the key `"external-sales-grantor"`, and looks
+1. CF binds `synonym-grantor-service` to the deployer module → credentials appear in
+   `VCAP_SERVICES["synonym-grantor-service"]`
+2. The deployer reads `.hdbgrants`, finds the key `"synonym-grantor-service"`, and looks
    up that name in `VCAP_SERVICES` to get the grantor user's credentials
 3. Using those credentials, it connects to the external HANA schema and issues `SELECT`
    (with grant option) to the `#OO` user and plain `SELECT` to the `#RT` user
-4. The deployer reads `.hdbsynonymconfig`, finds `"service": "external-sales-grantor"`,
+4. The deployer reads `.hdbsynonymconfig`, finds `"service": "synonym-grantor-service"`,
    and uses the resolved schema/object to deploy the synonym
 5. At runtime, application code accesses `"SALES_SUMMARY"` — the synonym — and the
    `#RT` user's `SELECT` privilege is what makes that work
@@ -350,7 +351,7 @@ block in `.hdbgrants`.
    cf services
    cf env <your-deployer-app-name>
    ```
-   Confirm `external-sales-grantor` appears in `VCAP_SERVICES` with a `credentials`
+   Confirm `synonym-grantor-service` appears in `VCAP_SERVICES` with a `credentials`
    block containing `host`, `user`, and `password`.
 
 4. **Check for schema mismatch** — the `"schema"` value in `.hdbsynonymconfig` and

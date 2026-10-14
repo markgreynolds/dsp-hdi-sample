@@ -1,5 +1,6 @@
 mta_archives/
 **/node_modules/**
+.vscode
 
 # auto generated wildcard
 db/.env
